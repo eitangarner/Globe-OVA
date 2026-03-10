@@ -28,7 +28,8 @@ source "qemu" "appliance" {
   boot_command = [
     "c<wait>",
     "set linux_gfx_mode=text<enter>",
-    "linux /casper/vmlinuz --- autoinstall ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/<enter><wait>",
+    # Added quotes around the ds string and 'console=ttyS0' for headless stability
+    "linux /casper/vmlinuz --- autoinstall \"ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\" console=ttyS0<enter><wait>",
     "initrd /casper/initrd<enter><wait>",
     "boot<enter>"
   ]
@@ -48,6 +49,7 @@ source "qemu" "appliance" {
   qemuargs = [
     ["-display", "none"],
     ["-vga", "none"],
+    ["-serial", "stdio"], # Routes VM output to your GitHub logs
     ["-device", "virtio-net-pci,netdev=net0"],
     ["-netdev", "user,id=net0,hostfwd=tcp::{{ .SSHHostPort }}-:22"]
   ]
