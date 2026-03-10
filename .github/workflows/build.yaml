@@ -1,15 +1,22 @@
 name: Build Appliance
-on: [push] # This triggers the build every time you upload code
+on: [push]
 
 jobs:
   packer-build:
-    runs-on: ubuntu-latest # This is a REAL Intel machine!
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Install QEMU and Packer
         run: |
+          # 1. Add HashiCorp's official GPG key
+          wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+          
+          # 2. Add the HashiCorp repository to apt
+          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+          
+          # 3. Update and install everything
           sudo apt-get update
           sudo apt-get install -y qemu-utils qemu-kvm packer
 
@@ -17,7 +24,10 @@ jobs:
         run: packer init build.pkr.hcl
 
       - name: Run Packer Build
-        run: packer build build.pkr.hcl
+        run: |
+          # We use sudo here because KVM acceleration on GitHub runners 
+          # usually requires root privileges to access /dev/kvm
+          sudo packer build build.pkr.hcl
 
       - name: Upload Finished Appliance
         uses: actions/upload-artifact@v4
