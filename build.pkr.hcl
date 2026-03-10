@@ -41,14 +41,10 @@ source "qemu" "appliance" {
   shutdown_command = "echo 'admin' | sudo -S shutdown -P now"
 
   # 6. HEADLESS & LOGGING
-  headless            = true
-  use_default_display = false
-  display             = "none"
-  
+  # We remove the separate display/headless lines and use qemuargs for everything
   qemuargs = [
-    ["-display", "none"],
-    ["-vga", "none"],
-    ["-serial", "stdio"],
+    ["-nographic"],             # THE FIX: Disables VGA and redirects to terminal
+    ["-serial", "mon:stdio"],   # Multiplexes the serial port to your GitHub logs
     ["-device", "virtio-net-pci,netdev=net0"],
     ["-netdev", "user,id=net0,hostfwd=tcp::{{ .SSHHostPort }}-:22"]
   ]

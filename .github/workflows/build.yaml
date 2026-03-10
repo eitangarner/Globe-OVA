@@ -19,19 +19,22 @@ jobs:
           # 3. Update and install everything
           sudo apt-get update
           sudo apt-get install -y qemu-utils qemu-kvm packer
+          
+          # 4. Ensure current user has KVM access for hardware acceleration
+          sudo adduser $USER kvm
 
       - name: Initialize Packer
         run: packer init build.pkr.hcl
 
       - name: Run Packer Build
         env:
-          PACKER_LOG: 1  # This prints Packer's internal heartbeat to the console
+          PACKER_LOG: 1 # Enables detailed logging to find the "Actual Problem"
         run: |
-          # We use sudo here because KVM acceleration on GitHub runners 
-          # usually requires root privileges to access /dev/kvm
+          # Use sudo to ensure QEMU can access /dev/kvm for native speed
           sudo packer build build.pkr.hcl
 
       - name: Upload Finished Appliance
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: appliance-vmdk
