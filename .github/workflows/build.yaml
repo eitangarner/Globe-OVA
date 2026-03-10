@@ -24,6 +24,8 @@ jobs:
         run: packer init build.pkr.hcl
 
       - name: Run Packer Build
+        env:
+          PACKER_LOG: 1  # This prints Packer's internal heartbeat to the console
         run: |
           # We use sudo here because KVM acceleration on GitHub runners 
           # usually requires root privileges to access /dev/kvm

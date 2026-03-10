@@ -17,39 +17,38 @@ source "qemu" "appliance" {
   machine_type = "q35"
   
   # 3. VIRTUAL HARDWARE
-  cpus         = 4
-  memory       = 4096
-  disk_size    = "20G"
-  format       = "qcow2" 
+  cpus      = 4
+  memory    = 4096
+  disk_size = "20G"
+  format    = "qcow2" 
   
   # 4. THE CONNECTION
   http_directory = "http"
-  boot_wait      = "5s"
-  boot_command = [
+  boot_wait      = "10s"
+  boot_command   = [
     "c<wait>",
     "set linux_gfx_mode=text<enter>",
-    # Added quotes around the ds string and 'console=ttyS0' for headless stability
     "linux /casper/vmlinuz --- autoinstall \"ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\" console=ttyS0<enter><wait>",
     "initrd /casper/initrd<enter><wait>",
     "boot<enter>"
   ]
 
-  # 5. CREDENTIALS & PERFORMANCE (Unified)
+  # 5. CREDENTIALS & PERFORMANCE
   ssh_username     = "admin"
   ssh_password     = "admin"
-  ssh_timeout      = "30m"          # Increased slightly to be safe for GitHub
-  accelerator      = "kvm"          # This makes GitHub build at native speed
+  ssh_timeout      = "30m"          
+  accelerator      = "kvm"          
   shutdown_command = "echo 'admin' | sudo -S shutdown -P now"
 
-  # 6. HEADLESS (Crucial for GitHub runners)
+  # 6. HEADLESS & LOGGING
   headless            = true
   use_default_display = false
-  display            = "none"
+  display             = "none"
   
   qemuargs = [
     ["-display", "none"],
     ["-vga", "none"],
-    ["-serial", "stdio"], # Routes VM output to your GitHub logs
+    ["-serial", "stdio"],
     ["-device", "virtio-net-pci,netdev=net0"],
     ["-netdev", "user,id=net0,hostfwd=tcp::{{ .SSHHostPort }}-:22"]
   ]
