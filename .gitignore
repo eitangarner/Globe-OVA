@@ -1,0 +1,11 @@
+# Ignore the large ISO files
+*.iso
+.packer.d/
+
+# Ignore the build outputs
+output-*/
+*.vmdk
+*.qcow2
+
+# Ignore Mac system files
+.DS_Store

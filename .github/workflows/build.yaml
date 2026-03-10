@@ -1,0 +1,26 @@
+name: Build Appliance
+on: [push] # This triggers the build every time you upload code
+
+jobs:
+  packer-build:
+    runs-on: ubuntu-latest # This is a REAL Intel machine!
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install QEMU and Packer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-utils qemu-kvm packer
+
+      - name: Initialize Packer
+        run: packer init build.pkr.hcl
+
+      - name: Run Packer Build
+        run: packer build build.pkr.hcl
+
+      - name: Upload Finished Appliance
+        uses: actions/upload-artifact@v4
+        with:
+          name: appliance-vmdk
+          path: output-appliance/appliance.vmdk

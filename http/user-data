@@ -1,0 +1,25 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+  timezone: Asia/Jerusalem
+  identity:
+    hostname: globe
+    username: admin
+    password: "$6$ycPa0VwaR.mo5ZGZ$hVXasy/wOGsum8BvB0I1/EeAXpmcQid42uJsIWR9soMgUffNWOBQBpmUreBt7xO9XYwxIqRVXlgyIhC48zDDP."
+  ssh:
+    install-server: true
+    allow-pw: true
+  storage:
+    layout:
+      name: direct
+  packages:
+    - docker.io
+    - docker-compose
+    - python3
+    - p7zip-full
+    - nano
+  late-commands:
+    - curtin in-target --target=/target -- usermod -aG docker admin
