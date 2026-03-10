@@ -9,8 +9,8 @@ packer {
 
 source "qemu" "appliance" {
   # 1. THE ISO
-  iso_url      = "https://releases.ubuntu.com/22.04.4/ubuntu-22.04.4-live-server-amd64.iso"
-  iso_checksum = "file:https://releases.ubuntu.com/22.04.4/SHA256SUMS"
+  iso_url      = "https://releases.ubuntu.com/25.10/ubuntu-25.10-live-server-amd64.iso"
+  iso_checksum = "file:https://releases.ubuntu.com/25.10/SHA256SUMS"
   
   # 2. THE EMULATOR
   qemu_binary  = "qemu-system-x86_64"
@@ -27,24 +27,25 @@ source "qemu" "appliance" {
   boot_wait      = "10s"
   boot_command   = [
     "c<wait>",
-    "set linux_gfx_mode=text<enter>",
-    "linux /casper/vmlinuz --- autoinstall \"ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\" console=ttyS0<enter><wait>",
+    "linux /casper/vmlinuz --- autoinstall ds=nocloud-net\\;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ console=ttyS0<enter><wait>",
     "initrd /casper/initrd<enter><wait>",
     "boot<enter>"
   ]
 
   # 5. CREDENTIALS & PERFORMANCE
-  ssh_username     = "admin"
-  ssh_password     = "admin"
-  ssh_timeout      = "30m"          
-  shutdown_command = "echo 'admin' | sudo -S shutdown -P now"
+  ssh_username              = "admin"
+  ssh_password              = "admin"
+  ssh_timeout               = "45m"
+  ssh_agent_auth            = false
+  ssh_clear_authorized_keys = true          
+  shutdown_command          = "echo 'admin' | sudo -S shutdown -P now"
 
   # 6. HEADLESS & LOGGING
-  # We remove the separate display/headless lines and use qemuargs for everything
   headless = true
+  
+  # Removed the manual -netdev. Added -serial stdio so you can read the boot logs in GitHub Actions!
   qemuargs = [
-    ["-device", "virtio-net-pci,netdev=net0"],
-    ["-netdev", "user,id=net0,hostfwd=tcp::{{ .SSHHostPort }}-:22"]
+    ["-serial", "stdio"]
   ]
 }
 
