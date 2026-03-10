@@ -37,14 +37,12 @@ source "qemu" "appliance" {
   ssh_username     = "admin"
   ssh_password     = "admin"
   ssh_timeout      = "30m"          
-  accelerator      = "kvm"          
   shutdown_command = "echo 'admin' | sudo -S shutdown -P now"
 
   # 6. HEADLESS & LOGGING
   # We remove the separate display/headless lines and use qemuargs for everything
+  headless = true
   qemuargs = [
-    ["-nographic"],             # THE FIX: Disables VGA and redirects to terminal
-    ["-serial", "mon:stdio"],   # Multiplexes the serial port to your GitHub logs
     ["-device", "virtio-net-pci,netdev=net0"],
     ["-netdev", "user,id=net0,hostfwd=tcp::{{ .SSHHostPort }}-:22"]
   ]

@@ -1,3 +1,4 @@
+# .github/workflows/build.yaml
 name: Build Appliance
 on: [push]
 
@@ -19,9 +20,6 @@ jobs:
           # 3. Update and install everything
           sudo apt-get update
           sudo apt-get install -y qemu-utils qemu-kvm packer
-          
-          # 4. Ensure current user has KVM access for hardware acceleration
-          sudo adduser $USER kvm
 
       - name: Initialize Packer
         run: packer init build.pkr.hcl
@@ -30,8 +28,8 @@ jobs:
         env:
           PACKER_LOG: 1 # Enables detailed logging to find the "Actual Problem"
         run: |
-          # Use sudo to ensure QEMU can access /dev/kvm for native speed
-          sudo packer build build.pkr.hcl
+          # Standard privileges are sufficient since the runner user is in the kvm group
+          packer build build.pkr.hcl
 
       - name: Upload Finished Appliance
         if: success()
