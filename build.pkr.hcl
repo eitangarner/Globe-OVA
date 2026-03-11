@@ -35,7 +35,7 @@ source "qemu" "appliance" {
   # 5. CREDENTIALS & PERFORMANCE
   ssh_username              = "admin"
   ssh_password              = "admin"
-  ssh_timeout               = "90m"
+  ssh_timeout               = "180m"
   ssh_agent_auth            = false
   ssh_clear_authorized_keys = true          
   shutdown_command          = "echo 'admin' | sudo -S shutdown -P now"
